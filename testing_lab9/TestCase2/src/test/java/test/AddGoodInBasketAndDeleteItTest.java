@@ -8,35 +8,39 @@ import org.testng.annotations.Test;
 import page.BasketPage;
 import page.GoodPage;
 
-import java.util.Base64;
-
 public class AddGoodInBasketAndDeleteItTest {
     private ChromeDriver driver;
     private GoodPage goodPage;
     private BasketPage basketPage;
-    String addedGoodVendorCode; // артикул добавляемого товара
+    // ссылка на страницу добавляемого товара - единственный id
+    // к ней же можно получить доступ из корзины, при нажатии на изображение
+    String addedGoodPageUrl;
 
-    @BeforeMethod (alwaysRun = true)
-    public void browserSetupAndOpenGoodPage(){
+    @BeforeMethod(alwaysRun = true)
+    public void browserSetupAndOpenGoodPage() {
         driver = new ChromeDriver();
-        goodPage = new GoodPage(driver);
-        goodPage.openPage();
     }
 
     @Test
-    public void goodExistsInBasketAndDeleteItTest(){
-        addedGoodVendorCode = goodPage.addGoodInBasket();
+    public void goodExistsInBasketAndDeleteItTest()
+            throws InterruptedException {
+        goodPage = new GoodPage(driver);
+        goodPage.openPage();
+
+        addedGoodPageUrl = goodPage.addGoodInBasket();
         basketPage = new BasketPage(driver);
         basketPage.openPage();
 
-        Assert.assertTrue(basketPage.checkIfGoodExistsInBasket(addedGoodVendorCode));
+        Assert.assertTrue(basketPage.checkIfGoodExistsInBasket(addedGoodPageUrl));
+        Thread.sleep(3000);
 
-        basketPage.deleteGoodFromBasket(addedGoodVendorCode);
-        Assert.assertFalse(basketPage.checkIfGoodExistsInBasket(addedGoodVendorCode));
+        basketPage.deleteGoodFromBasket(addedGoodPageUrl);
+        Assert.assertFalse(basketPage.checkIfGoodExistsInBasket(addedGoodPageUrl));
+        Thread.sleep(3000);
     }
 
-    @AfterMethod (alwaysRun = true)
-    public void browserTearDown(){
+    @AfterMethod(alwaysRun = true)
+    public void browserTearDown() {
         driver.quit();
         driver = null;
     }

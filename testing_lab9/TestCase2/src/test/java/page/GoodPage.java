@@ -6,7 +6,6 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.FindBy;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.pagefactory.AjaxElementLocatorFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import waits.CustomConditions;
 
@@ -15,13 +14,10 @@ import java.time.Duration;
 public class GoodPage {
     WebDriver driver;
     private final String GOOD_PAGE_URL =
-            "https://gutenberg.ru/molotyy_kofe/kofe_malongo_molotyy_moka_efiopiya_sidamo_250_g/";
+            "https://everydaycoffee.by/catalog/kupazhi/mo-lo-ko-fe/";
 
-    @FindBy(xpath="//span[@class='btn-lg to-cart btn btn-default transition_bg animate-load']")
+    @FindBy(xpath="//button[@class='button product__cart-btn']")
     private WebElement addInBasketButton;
-
-    @FindBy(xpath="//span[@class='article__value']")
-    private WebElement addedGoodVendorCode;
 
     public GoodPage(WebDriver driver){
         this.driver = driver;
@@ -29,20 +25,15 @@ public class GoodPage {
 
     public void openPage(){
         driver.get(GOOD_PAGE_URL);
+        driver.manage().window().maximize();
         new WebDriverWait(driver, Duration.ofSeconds(10))
                 .until(CustomConditions.jQueryAJAXCompleted());
         PageFactory.initElements(new AjaxElementLocatorFactory(driver, 3000), this);
     }
 
     public String addGoodInBasket(){
-        //element click intercepted - исключение, которое означает, что есть другой элемент над вашим
-        // (всплывающее окно и пр.), поэтому, когда Selenium пытается нажать на ваш элемент,
-        // но фактически он нажимает на этот перекрывающий элемент; поэтому я добавила прокрутку страницы
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        js.executeScript("scroll(0,900)");
-
-        new WebDriverWait(driver, Duration.ofSeconds(10))
-                .until(ExpectedConditions.elementToBeClickable(addInBasketButton)).click();
-        return addedGoodVendorCode.getText();
+        JavascriptExecutor executor = (JavascriptExecutor)driver;
+        executor.executeScript("arguments[0].click();", addInBasketButton);
+        return GOOD_PAGE_URL;
     }
 }
