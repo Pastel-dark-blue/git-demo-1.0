@@ -12,22 +12,16 @@ import page.MainPage;
 
 import java.util.ArrayList;
 
-public class EmailForSubscriptionTest {
-    private ChromeDriver driver;
+public class EmailForSubscriptionTest extends CommonConditions{
     private MainPage mainPage;
     private GenerateTempEmailPage generateTempEmailPage;
     private EmailMessagesPage emailMessagesPage;
 
-    @BeforeMethod(alwaysRun = true)
-    public void browserSetupAndOpenGoodPage() {
-        driver = new ChromeDriver();
-    }
-
     @Test
     public void emailForSubscriptionIsSending() throws InterruptedException {
         generateTempEmailPage = new GenerateTempEmailPage(driver);
-        generateTempEmailPage.open();
-        generateTempEmailPage.copyEmailButtonClick();
+        generateTempEmailPage.openPage();
+        String generatedEmail = generateTempEmailPage.getGeneratedEmail();
 
         ((JavascriptExecutor) driver).executeScript("window.open()");
         ArrayList<String> tabs = new ArrayList<String>(driver.getWindowHandles());
@@ -35,8 +29,8 @@ public class EmailForSubscriptionTest {
 
         mainPage = new MainPage(driver);
         mainPage
-                .open()
-                .pasteEmailAddressInField()
+                .openPage()
+                .pasteEmailAddressInField(generatedEmail)
                 .clickSubscribe();
         // всплывающее окно после нажатия кнопки "Подписаться" должно быть
         // о том, что всё прошло ок и письмо отправлено
@@ -48,14 +42,8 @@ public class EmailForSubscriptionTest {
         emailMessagesPage = new EmailMessagesPage(driver);
         // открываем страницу со списком сообщений только что сгенерированной почты
         emailMessagesPage
-                .open();
+                .openPage();
         Assert.assertTrue(emailMessagesPage.checkIfMessageFromSiteExists("coffee@everydaycoffee.by"));
         Thread.sleep(2000);
-    }
-
-    @AfterMethod(alwaysRun = true)
-    public void browserTearDown() {
-        driver.quit();
-        driver = null;
     }
 }

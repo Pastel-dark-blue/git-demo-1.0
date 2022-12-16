@@ -38,8 +38,7 @@ public class GenerateTempEmailPage {
         return this;
     }
 
-    public EmailMessagesPage checkEmailButtonClick() {
+    public void checkEmailButtonClick() {
         checkEmailButton.click();
-        return new EmailMessagesPage(driver);
     }
 }
